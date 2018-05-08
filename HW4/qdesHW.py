@@ -53,10 +53,4 @@ def testBruteForceWithNumberOfPairs(n):
         for i, key in enumerate(keyGroup):
             print(" {:d} ".format(key), end='')
             if i + 1 == len(keyGroup):
-                print("")
-
-k = randrange(2 ** 16)
-pt1 = randrange(2 ** 16)
-pt2 = randrange(2 ** 16)
-ct1 = qtE(pt1, k)
-ct2 = qtE(pt2, k)
+                print()

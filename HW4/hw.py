@@ -24,14 +24,6 @@ def getOuterBits(n):
     else:
         return 0
 
-def binToInt(b):
-    integer = 0
-    for i, bit in enumerate(b[::-1]):
-        if int(bit):
-            integer += 2 ** i
-
-    return integer
-
 def s1(i):
     row0 = [14,4,13,1,2,15,11,8,3,10,6,12,5,9,0,7]
     row1 = [0,15,7,4,14,2,13,1,10,6,12,11,9,5,3,8]
