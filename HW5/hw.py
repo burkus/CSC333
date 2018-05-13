@@ -4,29 +4,54 @@ from qDES import *
 from random import randrange
 # Meet in the middle attack
 r = 2 ** 16
+
 def mithm(pairs):
-    #ct1 decrypted = pt1 encrypted on key k
     pt, ct = pairs[0]
     encryptionMap = getPlaintextEncryptions(pt, r)
-    decryptionMap = getCiphertextDecryptions(ct, r)
-
-    keyPairs = []
-    for ct, k1s in encryptionMap.items():
-        if ct in decryptionMap.keys():
-            k2s = decryptionMap[ct]
+    candidatePairs = []
+    for k in range(r):
+        decryption = qtD(ct, k)
+        if decryption in encryptionMap.keys():
+            k1s = encryptionMap[decryption]
             for k1 in k1s:
-                for k2 in k2s:
-                    keyPairs.append((k1, k2))
+                candidatePairs.append((k1, k))
 
-    for pair in pairs[1:]:
-        pti, cti = pair
-        keys = []
-        for pair in keyPairs:
-            k1, k2 = pair
-            if qtD(cti, k2) == qtE(pti, k1):
-                keys.append((k1, k2))
+    keys = []
+    for kp in candidatePairs:
+        k1, k2 = kp
+        works = True
+        for pair in pairs:
+            pt, ct = pair
+            if qtD(ct, k2) != qtE(pt, k1):
+                works = False
+                break
+        if works:
+            keys.append(kp)
     return keys
 
+def mithm0(pairs):
+    pt, ct = pairs[0]
+    encryptionMap = getPlaintextEncryptions(pt, r)
+    candidatePairs = []
+    for k in range(r):
+        decryption = qtD(ct, k)
+        if decryption in encryptionMap.keys():
+            k1s = encryptionMap[decryption]
+            for k1 in k1s:
+                candidatePairs.append((k1, k))
+
+    keys = []
+
+    def filterCandidates(candidatePairs, pairs):
+        if len(pairs) == 0:
+            return candidatePairs
+
+        pt, ct = pairs[0]
+        f = lambda kp: qtD(ct, kp[1]) == qtE(pt, kp[0])
+        filteredCandidatePairs = filter(f, candidatePairs)
+        return filterCandidates(filteredCandidatePairs, pairs[1:])
+
+    return filterCandidates(candidatePairs, pairs[1:])
 
 def getPlaintextEncryptions(pt, r):
     map = {}
@@ -48,7 +73,7 @@ def getCiphertextDecryptions(ct, r):
             map[decryption] = [k]
     return map
 
-def testMithm():
+def testMithm(mithm):
     k1 = randrange(r)
     k2 = randrange(r)
     pt1 = 12345
