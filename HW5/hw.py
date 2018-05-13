@@ -40,8 +40,6 @@ def mithm0(pairs):
             for k1 in k1s:
                 candidatePairs.append((k1, k))
 
-    keys = []
-
     def filterCandidates(candidatePairs, pairs):
         if len(pairs) == 0:
             return candidatePairs
@@ -85,12 +83,12 @@ def testMithm(mithm):
     startTime = clock()
     keysFound = mithm([(pt1, ct1), (pt2, ct2), (pt3, ct3)])
     endTime = clock()
+    print("Time Elasped: " + str(endTime - startTime) + " seconds")
     print("Keys used: ", end="")
     print(k1, k2, sep=", ")
     print("Keys found: ")
     for pair in keysFound:
         print(pair[0], pair[1], sep=", ")
-    print("Time Elasped: " + str(endTime - startTime) + " seconds")
 
 def testMithmWithPairs(pairs):
     startTime = clock()
@@ -113,28 +111,20 @@ def testMithmWithPairs(pairs):
             if works == 3:
                 return (k1, k2)
 
-def bruteForcePair(pair):
-    pt, ct = pair
+def bruteForcePairs(pairs):
+    pt, ct = pairs[0]
+    keys = []
     for k in range(2**16):
         ctp = qtE(pt, k)
         k2 = ctp ^ ct
-        if k2 ^ ctp == ct:
-            return (k, k2)
+        works = True
+        for pair in pairs[1:]:
+            pt, ct = pair
+            if impqtE(pt, k, k2) != ct:
+                works = False
+        if works:
+            keys.append((k, k2))
+    return keys
+
 
 pairs = ((81273, 54174), (2785, 44313), (90135, 18467))
-
-def bruteForcePairs(pairs):
-    for pair in pairs:
-        pt, ct = pair
-        keys = bruteForcePair(pair)
-        print()
-        print("(k1, k2) = " + str(keys))
-        print("Double Checking Keys...")
-        k1, k2 = keys
-        output = impqtE(pt, k1, k2)
-        if output == ct:
-            print("Keys are correct")
-            print("(pt, ct) =", pair)
-            print("impqtE({}, {}, {}) = {}".format(pt, k1, k2, output))
-        else:
-            print("RIP.")
