@@ -118,13 +118,28 @@ def bruteForcePairs(pairs):
         ctp = qtE(pt, k)
         k2 = ctp ^ ct
         works = True
-        for pair in pairs[1:]:
+        for pair in pairs:
             pt, ct = pair
             if impqtE(pt, k, k2) != ct:
                 works = False
+                break
         if works:
             keys.append((k, k2))
     return keys
 
 
 pairs = ((81273, 54174), (2785, 44313), (90135, 18467))
+
+
+def testBruteForcePairs():
+    k1 = randrange(r)
+    k2 = randrange(r)
+    pt1 = 12345
+    pt2 = 5678
+    pt3 = 4352
+    ct1 = impqtE(pt1, k1, k2)
+    ct2 = impqtE(pt2, k1, k2)
+    ct3 = impqtE(pt3, k1, k2)
+    pairs = ((pt1, ct1),(pt2, ct2), (pt3, ct3))
+    print("keys used:", k1, k2)
+    return bruteForcePairs(pairs)
